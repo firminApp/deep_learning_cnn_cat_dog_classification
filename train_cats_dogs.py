@@ -124,9 +124,10 @@ class SimpleCNN(nn.Module):
             nn.MaxPool2d(2),
             nn.Dropout2d(p=dropout_prob),
         )
+        # 4× MaxPool2d(2) sur 224×224 → 14×14
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(256 * (img_features := 14) * img_features, 512),
+            nn.Linear(256 * 14 * 14, 512),
             nn.ReLU(inplace=True),
             nn.Dropout(p=dropout_prob),
             nn.Linear(512, num_classes),
@@ -140,7 +141,7 @@ class SimpleCNN(nn.Module):
 class TransferResNet18(nn.Module):
     def __init__(self, num_classes: int = 2, feature_extract: bool = True, dropout_prob: float = 0.5):
         super().__init__()
-        self.model = models.resnet18(pretrained=True)
+        self.model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
         if feature_extract:
             for param in self.model.parameters():
                 param.requires_grad = False
